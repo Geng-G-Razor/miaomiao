@@ -1,3 +1,5 @@
+import { router } from '@kit.ArkUI';
+
 @Entry
 @Component
 struct Practice {
@@ -40,6 +42,16 @@ struct Practice {
         })
       }
       .height(200)
+      
+      // 4. 导航组件
+      Button('返回首页')
+        .fontSize(16)
+        .backgroundColor('#007DFF')
+        .borderRadius(8)
+        .padding({ top: 12, bottom: 12, left: 24, right: 24 })
+        .onClick(() => {
+          router.back()
+        })
     }
     .width('100%')
     .height('100%')

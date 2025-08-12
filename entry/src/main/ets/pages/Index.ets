@@ -38,7 +38,7 @@ struct Index {
       await this.saveCurrentState();
       
       // 等待3秒并显示倒计时
-      await this.waitWithMessage(3);
+      await this.waitWithMessage(1);
       
       // 执行页面跳转
       await router.pushUrl({

@@ -1,5 +1,6 @@
 {
   "src": [
+    "pages/TabsPage",
     "pages/Index",
     "pages/Practice"
   ]

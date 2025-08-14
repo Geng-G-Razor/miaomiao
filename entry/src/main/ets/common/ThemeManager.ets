@@ -8,6 +8,7 @@ export enum ThemeType {
 // 定义主题配置接口
 export interface ThemeConfig {
   name: string;
+  nextThemeName: string;
   backgroundColor: string;
   primaryColor: string;
   secondaryColor: string;
@@ -25,11 +26,13 @@ export class ThemeManager {
   private static instance: ThemeManager;
   private currentTheme: ThemeType = ThemeType.DEFAULT;
   private listeners: Array<(theme: ThemeType) => void> = [];
+  private nextTheme: ThemeType = ThemeType.PINK;
 
   // 主题配置
   private themeConfigs: Record<ThemeType, ThemeConfig> = {
     [ThemeType.DEFAULT]: {
       name: '默认',
+      nextThemeName: '粉色',
       backgroundColor: '#F8F9FA',
       primaryColor: '#4ECDC4',
       secondaryColor: '#FF6B6B',
@@ -43,6 +46,7 @@ export class ThemeManager {
     },
     [ThemeType.PINK]: {
       name: '粉色',
+      nextThemeName: '深色',
       backgroundColor: '#FEF7F7',
       primaryColor: '#F8BBD9',
       secondaryColor: '#F5A3C7',
@@ -56,6 +60,7 @@ export class ThemeManager {
     },
     [ThemeType.DARK]: {
       name: '深色',
+      nextThemeName: '默认',
       backgroundColor: '#1A1A1A',
       primaryColor: '#64B5F6',
       secondaryColor: '#4FC3F7',

@@ -172,11 +172,11 @@ export struct ShortMeowPage {
           // 主题切换按钮
           Button() {
             Row({ space: 6 }) {
-              Image($r('sys.media.ohos_ic_public_more'))
-                .width(16)
+              Image($r('app.media.switch'))
+                .width(12)
                 .height(16)
                 .fillColor(Color.White)
-              Text(this.getCurrentThemeConfig().name)
+              Text(this.getCurrentThemeConfig().nextThemeName)
                 .fontSize(12)
                 .fontColor(Color.White)
             }

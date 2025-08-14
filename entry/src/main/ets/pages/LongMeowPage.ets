@@ -26,12 +26,29 @@ export struct LongMeowPage {
 
   // 长猫叫声数据 - 使用定义的接口
   private longMeowSounds: Array<LongMeowSound> = [
+    // 原始数据组
     { id: 'kitten', name: '奶猫叫', description: '细嫩的小奶猫叫声', duration: '10s' },
     { id: 'fight', name: '公猫打架', description: '激烈的打斗嘶吼声', duration: '15s' },
     { id: 'mating', name: '母猫发情', description: '发情期的长声呼唤', duration: '20s' },
     { id: 'purr', name: '满足呼噜', description: '舒适满足的呼噜声', duration: '30s' },
     { id: 'hunt', name: '狩猎模式', description: '发现猎物时的低吼', duration: '8s' },
-    { id: 'territory', name: '领地宣示', description: '宣示领地的长嚎', duration: '25s' }
+    { id: 'territory', name: '领地宣示', description: '宣示领地的长嚎', duration: '25s' },
+    
+    // 第二组 - 情感表达类
+    { id: 'lonely', name: '孤独呼唤', description: '独自在家时的长声呼唤', duration: '18s' },
+    { id: 'excited', name: '兴奋尖叫', description: '看到主人回家的兴奋叫声', duration: '12s' },
+    { id: 'scared', name: '恐惧嚎叫', description: '受到惊吓时的长声嚎叫', duration: '22s' },
+    { id: 'pain', name: '疼痛呻吟', description: '身体不适时的低沉呻吟', duration: '16s' },
+    { id: 'warning', name: '警告嘶吼', description: '警告入侵者的威胁声', duration: '14s' },
+    { id: 'comfort', name: '安慰呼噜', description: '寻求安慰时的轻柔呼噜', duration: '28s' },
+    
+    // 第三组 - 行为需求类
+    { id: 'food_demand', name: '强烈要饭', description: '饥饿时的持续要食声', duration: '35s' },
+    { id: 'door_request', name: '开门请求', description: '想要出门时的持续叫声', duration: '26s' },
+    { id: 'attention_seek', name: '撒娇求宠', description: '想要主人关注的撒娇声', duration: '19s' },
+    { id: 'play_invite', name: '邀请游戏', description: '邀请主人一起玩耍的叫声', duration: '13s' },
+    { id: 'litter_complaint', name: '猫砂抗议', description: '对脏猫砂的不满抗议声', duration: '21s' },
+    { id: 'night_patrol', name: '夜间巡逻', description: '深夜巡视领地的低吼声', duration: '24s' }
   ];
 
   // 获取当前主题配置

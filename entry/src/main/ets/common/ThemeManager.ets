@@ -1,3 +1,6 @@
+import { preferences } from '@kit.ArkData';
+import { BusinessError } from '@kit.BasicServicesKit';
+
 // 定义主题枚举
 export enum ThemeType {
   DEFAULT = 'default',
@@ -26,7 +29,9 @@ export class ThemeManager {
   private static instance: ThemeManager;
   private currentTheme: ThemeType = ThemeType.DEFAULT;
   private listeners: Array<(theme: ThemeType) => void> = [];
-  private nextTheme: ThemeType = ThemeType.PINK;
+  private preferencesStore: preferences.Preferences | null = null;
+  private readonly THEME_KEY = 'selected_theme';
+  private readonly STORE_NAME = 'theme_preferences';
 
   // 主题配置
   private themeConfigs: Record<ThemeType, ThemeConfig> = {
@@ -81,6 +86,42 @@ export class ThemeManager {
     return ThemeManager.instance;
   }
 
+  // 初始化preferences存储
+  async initPreferences(context: Context): Promise<void> {
+    try {
+      this.preferencesStore = await preferences.getPreferences(context, this.STORE_NAME);
+      await this.loadSavedTheme();
+    } catch (error) {
+      console.error('初始化主题存储失败:', error);
+    }
+  }
+
+  // 加载保存的主题
+  private async loadSavedTheme(): Promise<void> {
+    if (!this.preferencesStore) return;
+    
+    try {
+      const savedTheme = await this.preferencesStore.get(this.THEME_KEY, ThemeType.DEFAULT) as string;
+      if (Object.values(ThemeType).includes(savedTheme as ThemeType)) {
+        this.currentTheme = savedTheme as ThemeType;
+      }
+    } catch (error) {
+      console.error('加载保存的主题失败:', error);
+    }
+  }
+
+  // 保存主题到存储
+  private async saveTheme(): Promise<void> {
+    if (!this.preferencesStore) return;
+    
+    try {
+      await this.preferencesStore.put(this.THEME_KEY, this.currentTheme);
+      await this.preferencesStore.flush();
+    } catch (error) {
+      console.error('保存主题失败:', error);
+    }
+  }
+
   getCurrentTheme(): ThemeType {
     return this.currentTheme;
   }
@@ -89,16 +130,22 @@ export class ThemeManager {
     return this.themeConfigs[theme || this.currentTheme];
   }
 
-  switchTheme(): void {
+  async switchTheme(): Promise<void> {
     const themes = Object.values(ThemeType);
     const currentIndex = themes.indexOf(this.currentTheme);
     const nextIndex = (currentIndex + 1) % themes.length;
     this.currentTheme = themes[nextIndex];
+    
+    // 保存新主题
+    await this.saveTheme();
     this.notifyListeners();
   }
 
-  setTheme(theme: ThemeType): void {
+  async setTheme(theme: ThemeType): Promise<void> {
     this.currentTheme = theme;
+    
+    // 保存新主题
+    await this.saveTheme();
     this.notifyListeners();
   }
 

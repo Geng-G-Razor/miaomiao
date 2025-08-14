@@ -185,8 +185,8 @@ export struct ShortMeowPage {
           .height(36)
           .backgroundColor(this.getCurrentThemeConfig().primaryColor)
           .borderRadius(18)
-          .onClick(() => {
-            this.themeManager.switchTheme();
+          .onClick(async () => {
+            await this.themeManager.switchTheme();
           })
         }
         .width('100%')

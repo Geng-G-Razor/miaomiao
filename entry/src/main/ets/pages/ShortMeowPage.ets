@@ -13,6 +13,7 @@ export struct ShortMeowPage {
   @State private audioPlayer: media.AVPlayer | null = null;
   @State private isPlaying: boolean = false;
   @State private currentSound: string = '';
+  @State private currentSoundId: string = ''; // 添加唯一标识符
   @State private currentPlayer: media.AVPlayer | null = null; // 添加当前播放器实例
 
   // 短猫叫声数据 - 使用定义的接口
@@ -73,6 +74,7 @@ export struct ShortMeowPage {
     try {
       this.isPlaying = true;
       this.currentSound = soundName;
+      this.currentSoundId = soundId; // 设置当前音频ID
       
       // 使用AVPlayer播放MP3音频文件
       const avPlayer = await media.createAVPlayer();
@@ -89,6 +91,7 @@ export struct ShortMeowPage {
           console.error('播放出错');
           this.isPlaying = false;
           this.currentSound = '';
+          this.currentSoundId = ''; // 清空音频ID
           avPlayer.release();
         }
       });
@@ -98,6 +101,7 @@ export struct ShortMeowPage {
         console.error('播放音频失败:', error);
         this.isPlaying = false;
         this.currentSound = '';
+        this.currentSoundId = ''; // 清空音频ID
         avPlayer.release();
       });
       
@@ -112,6 +116,7 @@ export struct ShortMeowPage {
       console.error('播放音频失败:', error);
       this.isPlaying = false;
       this.currentSound = '';
+      this.currentSoundId = ''; // 清空音频ID
     }
   }
 
@@ -124,85 +129,97 @@ export struct ShortMeowPage {
       }
       this.isPlaying = false;
       this.currentSound = '';
+      this.currentSoundId = ''; // 清空音频ID
     } catch (error) {
       console.error('停止播放失败:', error);
     }
   }
 
   build() {
-    Column({ space: 20 }) {
-      // 页面标题
-      Text('猫咪短语')
-        .fontSize(24)
-        .fontWeight(FontWeight.Bold)
-        .margin({ top: 20, bottom: 10 })
-      
-      Text('点击按钮听听猫咪想说什么~')
-        .fontSize(14)
-        .fontColor('#666666')
-        .margin({ bottom: 20 })
+    Stack() {
+      Column({ space: 20 }) {
+        // 页面标题
+        Text('猫咪短语')
+          .fontSize(24)
+          .fontWeight(FontWeight.Bold)
+          .margin({ top: 20, bottom: 10 })
+        
+        Text('点击按钮听听猫咪想说什么~')
+          .fontSize(14)
+          .fontColor('#666666')
+          .margin({ bottom: 20 })
 
-      // 声音按钮网格
-      Grid() {
-        ForEach(this.shortMeowSounds, (sound: MeowSound) => {
-          GridItem() {
-            Column({ space: 8 }) {
-              Button() {
-                Row({ space: 8 }) {
-                  // 根据播放状态显示不同图标
-                  if (this.isPlaying && this.currentSound === sound.name) {
-                    Image($r('sys.media.ohos_ic_public_pause'))
-                      .width(16)
-                      .height(16)
-                      .fillColor(Color.White)
-                  } else {
-                    Image($r('sys.media.ohos_ic_public_play'))
-                      .width(16)
-                      .height(16)
-                      .fillColor(Color.White)
+        // 声音按钮网格
+        Scroll() {
+          Grid() {
+            ForEach(this.shortMeowSounds, (sound: MeowSound) => {
+              GridItem() {
+                Column({ space: 8 }) {
+                  Button() {
+                    Row({ space: 8 }) {
+                      // 根据播放状态显示不同图标
+                      if (this.isPlaying && this.currentSoundId === sound.id) {
+                        Image($r('sys.media.ohos_ic_public_pause'))
+                          .width(16)
+                          .height(16)
+                          .fillColor(Color.White)
+                      } else {
+                        Image($r('sys.media.ohos_ic_public_play'))
+                          .width(16)
+                          .height(16)
+                          .fillColor(Color.White)
+                      }
+                      Text(sound.name)
+                        .fontSize(16)
+                        .fontColor(Color.White)
+                    }
+                    .justifyContent(FlexAlign.Center)
                   }
-                  Text(sound.name)
-                    .fontSize(16)
-                    .fontColor(Color.White)
+                  .width('100%')
+                  .height(50)
+                  .backgroundColor(this.currentSoundId === sound.id ? '#FF6B6B' : '#4ECDC4')
+                  .borderRadius(12)
+                  .onClick(async () => {
+                    // 如果点击的是正在播放的按钮，则停止播放
+                    if (this.isPlaying && this.currentSoundId === sound.id) {
+                      await this.stopSound();
+                    } else {
+                      // 如果正在播放其他音频，先停止当前播放
+                      if (this.isPlaying) {
+                        await this.stopSound();
+                      }
+                      // 播放新的音频
+                      await this.playSound(sound.id, sound.name);
+                    }
+                  })
+                  
+                  Text(sound.description)
+                    .fontSize(12)
+                    .fontColor('#999999')
+                    .textAlign(TextAlign.Center)
+                    .maxLines(2)
                 }
-                .justifyContent(FlexAlign.Center)
+                .width('100%')
+                .padding(8)
               }
-              .width('100%')
-              .height(50)
-              .backgroundColor(this.currentSound === sound.name ? '#FF6B6B' : '#4ECDC4')
-              .borderRadius(12)
-              .onClick(async () => {
-                // 如果点击的是正在播放的按钮，则停止播放
-                if (this.isPlaying && this.currentSound === sound.name) {
-                  await this.stopSound();
-                } else {
-                  // 如果正在播放其他音频，先停止当前播放
-                  if (this.isPlaying) {
-                    await this.stopSound();
-                  }
-                  // 播放新的音频
-                  await this.playSound(sound.id, sound.name);
-                }
-              })
-              
-              Text(sound.description)
-                .fontSize(12)
-                .fontColor('#999999')
-                .textAlign(TextAlign.Center)
-                .maxLines(2)
-            }
-            .width('100%')
-            .padding(8)
+            })
           }
-        })
+          .columnsTemplate('1fr 1fr')
+          .rowsGap(15)
+          .columnsGap(15)
+          .width('100%')
+        }
+        .layoutWeight(1)
+        .scrollable(ScrollDirection.Vertical)
+        .scrollBar(BarState.Auto)
+        .margin({ bottom: this.isPlaying ? 80 : 20 }) // 为底部状态栏留出空间
       }
-      .columnsTemplate('1fr 1fr')
-      .rowsGap(15)
-      .columnsGap(15)
       .width('100%')
-      .layoutWeight(1)
+      .height('100%')
+      .padding({ left: 20, right: 20, bottom: 20 })
+      .backgroundColor('#F8F9FA')
 
-      // 播放状态提示
+      // 固定在底部的播放状态提示
       if (this.isPlaying) {
         Row({ space: 10 }) {
           LoadingProgress()
@@ -214,42 +231,21 @@ export struct ShortMeowPage {
             .fontColor('#4ECDC4')
         }
         .justifyContent(FlexAlign.Center)
-        .margin({ bottom: 20 })
-      }
-      
-      // 悬浮停止按钮 - 只在播放时显示
-      if (false && this.isPlaying) {
-        Button() {
-          Row({ space: 8 }) {
-            Image($r('sys.media.ohos_ic_public_pause'))
-              .width(20)
-              .height(20)
-              .fillColor(Color.White)
-            Text('停止播放')
-              .fontSize(14)
-              .fontColor(Color.White)
-          }
-        }
-        .width(120)
-        .height(45)
-        .backgroundColor('#FF6B6B')
-        .borderRadius(22.5)
-        .position({ x: '50%', y: '90%' })
-        .translate({ x: '-50%', y: '-50%' })
+        .width('100%')
+        .height(60)
+        .backgroundColor(Color.White)
+        .borderRadius({ topLeft: 12, topRight: 12 })
         .shadow({
-          radius: 10,
-          color: 'rgba(0, 0, 0, 0.2)',
+          radius: 8,
+          color: 'rgba(0, 0, 0, 0.1)',
           offsetX: 0,
-          offsetY: 4
+          offsetY: -2
         })
-        .onClick(() => {
-          this.stopSound();
-        })
+        .position({ x: 0, y: '100%' })
+        .translate({ x: 0, y: -60 })
       }
     }
     .width('100%')
     .height('100%')
-    .padding({ left: 20, right: 20, bottom: 20 })
-    .backgroundColor('#F8F9FA')
   }
 }

@@ -17,6 +17,7 @@ export struct ShortMeowPage {
 
   // 短猫叫声数据 - 使用定义的接口
   private shortMeowSounds: Array<MeowSound> = [
+    // 第一组
     { id: 'eat', name: '吃饭', description: '喵~ (我饿了)' },
     { id: 'play', name: '出去玩', description: '喵喵~ (我想出去)' },
     { id: 'happy', name: '开心', description: '咕噜咕噜~ (我很开心)' },
@@ -24,7 +25,25 @@ export struct ShortMeowPage {
     { id: 'sleepy', name: '困了', description: '呼噜~ (我想睡觉)' },
     { id: 'attention', name: '求关注', description: '喵? (看看我)' },
     { id: 'thanks', name: '感谢', description: '咪~ (谢谢)' },
-    { id: 'no', name: '拒绝', description: '嘶嘶~ (不要)' }
+    { id: 'no', name: '拒绝', description: '嘶嘶~ (不要)' },
+    // 第二组
+    { id: 'eat2', name: '吃饭', description: '喵~ (我饿了)' },
+    { id: 'play2', name: '出去玩', description: '喵喵~ (我想出去)' },
+    { id: 'happy2', name: '开心', description: '咕噜咕噜~ (我很开心)' },
+    { id: 'angry2', name: '生气', description: '嘶~ (我生气了)' },
+    { id: 'sleepy2', name: '困了', description: '呼噜~ (我想睡觉)' },
+    { id: 'attention2', name: '求关注', description: '喵? (看看我)' },
+    { id: 'thanks2', name: '感谢', description: '咪~ (谢谢)' },
+    { id: 'no2', name: '拒绝', description: '嘶嘶~ (不要)' },
+    // 第三组
+    { id: 'eat3', name: '吃饭', description: '喵~ (我饿了)' },
+    { id: 'play3', name: '出去玩', description: '喵喵~ (我想出去)' },
+    { id: 'happy3', name: '开心', description: '咕噜咕噜~ (我很开心)' },
+    { id: 'angry3', name: '生气', description: '嘶~ (我生气了)' },
+    { id: 'sleepy3', name: '困了', description: '呼噜~ (我想睡觉)' },
+    { id: 'attention3', name: '求关注', description: '喵? (看看我)' },
+    { id: 'thanks3', name: '感谢', description: '咪~ (谢谢)' },
+    { id: 'no3', name: '拒绝', description: '嘶嘶~ (不要)' }
   ];
 
   aboutToAppear() {
@@ -128,17 +147,43 @@ export struct ShortMeowPage {
         ForEach(this.shortMeowSounds, (sound: MeowSound) => {
           GridItem() {
             Column({ space: 8 }) {
-              Button(sound.name)
-                .width('100%')
-                .height(50)
-                .fontSize(16)
-                .backgroundColor(this.currentSound === sound.name ? '#FF6B6B' : '#4ECDC4')
-                .fontColor(Color.White)
-                .borderRadius(12)
-                .enabled(!this.isPlaying || this.currentSound === sound.name)
-                .onClick(() => {
-                  this.playSound(sound.id, sound.name);
-                })
+              Button() {
+                Row({ space: 8 }) {
+                  // 根据播放状态显示不同图标
+                  if (this.isPlaying && this.currentSound === sound.name) {
+                    Image($r('sys.media.ohos_ic_public_pause'))
+                      .width(16)
+                      .height(16)
+                      .fillColor(Color.White)
+                  } else {
+                    Image($r('sys.media.ohos_ic_public_play'))
+                      .width(16)
+                      .height(16)
+                      .fillColor(Color.White)
+                  }
+                  Text(sound.name)
+                    .fontSize(16)
+                    .fontColor(Color.White)
+                }
+                .justifyContent(FlexAlign.Center)
+              }
+              .width('100%')
+              .height(50)
+              .backgroundColor(this.currentSound === sound.name ? '#FF6B6B' : '#4ECDC4')
+              .borderRadius(12)
+              .onClick(async () => {
+                // 如果点击的是正在播放的按钮，则停止播放
+                if (this.isPlaying && this.currentSound === sound.name) {
+                  await this.stopSound();
+                } else {
+                  // 如果正在播放其他音频，先停止当前播放
+                  if (this.isPlaying) {
+                    await this.stopSound();
+                  }
+                  // 播放新的音频
+                  await this.playSound(sound.id, sound.name);
+                }
+              })
               
               Text(sound.description)
                 .fontSize(12)
@@ -173,7 +218,7 @@ export struct ShortMeowPage {
       }
       
       // 悬浮停止按钮 - 只在播放时显示
-      if (this.isPlaying) {
+      if (false && this.isPlaying) {
         Button() {
           Row({ space: 8 }) {
             Image($r('sys.media.ohos_ic_public_pause'))

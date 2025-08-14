@@ -1,5 +1,6 @@
 import { media } from '@kit.MediaKit';
 import { promptAction } from '@kit.ArkUI';
+import { ThemeManager, ThemeType, ThemeConfig } from '../common/ThemeManager';
 
 // 定义猫叫声数据接口
 interface MeowSound {
@@ -13,10 +14,16 @@ export struct ShortMeowPage {
   @State private audioPlayer: media.AVPlayer | null = null;
   @State private isPlaying: boolean = false;
   @State private currentSound: string = '';
-  @State private currentSoundId: string = ''; // 添加唯一标识符
-  @State private currentPlayer: media.AVPlayer | null = null; // 添加当前播放器实例
+  @State private currentSoundId: string = '';
+  @State private currentPlayer: media.AVPlayer | null = null;
+  @State private currentTheme: ThemeType = ThemeType.DEFAULT;
+  
+  private themeManager: ThemeManager = ThemeManager.getInstance();
+  private themeListener = (theme: ThemeType) => {
+    this.currentTheme = theme;
+  };
 
-  // 短猫叫声数据 - 使用定义的接口
+  // 短猫叫声数据
   private shortMeowSounds: Array<MeowSound> = [
     // 第一组
     { id: 'eat', name: '吃饭', description: '喵~ (我饿了)' },
@@ -47,12 +54,20 @@ export struct ShortMeowPage {
     { id: 'no3', name: '拒绝', description: '嘶嘶~ (不要)' }
   ];
 
+  // 获取当前主题配置
+  private getCurrentThemeConfig(): ThemeConfig {
+    return this.themeManager.getThemeConfig(this.currentTheme);
+  }
+
   aboutToAppear() {
     this.initAudioPlayer();
+    this.currentTheme = this.themeManager.getCurrentTheme();
+    this.themeManager.addListener(this.themeListener);
   }
 
   aboutToDisappear() {
     this.releaseAudioPlayer();
+    this.themeManager.removeListener(this.themeListener);
   }
 
   private async initAudioPlayer() {
@@ -138,16 +153,46 @@ export struct ShortMeowPage {
   build() {
     Stack() {
       Column({ space: 20 }) {
-        // 页面标题
-        Text('猫咪短语')
-          .fontSize(24)
-          .fontWeight(FontWeight.Bold)
-          .margin({ top: 20, bottom: 10 })
-        
-        Text('点击按钮听听猫咪想说什么~')
-          .fontSize(14)
-          .fontColor('#666666')
-          .margin({ bottom: 20 })
+        // 页面标题区域
+        Row() {
+          Column() {
+            Text('猫咪短语')
+              .fontSize(24)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(this.getCurrentThemeConfig().textColor)
+            
+            Text('点击按钮听听猫咪想说什么~')
+              .fontSize(14)
+              .fontColor(this.getCurrentThemeConfig().subtitleColor)
+              .margin({ top: 5 })
+          }
+          .alignItems(HorizontalAlign.Start)
+          .layoutWeight(1)
+          
+          // 主题切换按钮
+          Button() {
+            Row({ space: 6 }) {
+              Image($r('sys.media.ohos_ic_public_more'))
+                .width(16)
+                .height(16)
+                .fillColor(Color.White)
+              Text(this.getCurrentThemeConfig().name)
+                .fontSize(12)
+                .fontColor(Color.White)
+            }
+          }
+          .width(70)
+          .height(36)
+          .backgroundColor(this.getCurrentThemeConfig().primaryColor)
+          .borderRadius(18)
+          .onClick(() => {
+            this.themeManager.switchTheme();
+          })
+        }
+        .width('100%')
+        .justifyContent(FlexAlign.SpaceBetween)
+        .alignItems(VerticalAlign.Top)
+        .margin({ top: 20, bottom: 20 })
 
         // 声音按钮网格
         Scroll() {
@@ -177,7 +222,7 @@ export struct ShortMeowPage {
                   }
                   .width('100%')
                   .height(50)
-                  .backgroundColor(this.currentSoundId === sound.id ? '#FF6B6B' : '#4ECDC4')
+                  .backgroundColor(this.currentSoundId === sound.id ? this.getCurrentThemeConfig().activeColor : this.getCurrentThemeConfig().primaryColor)
                   .borderRadius(12)
                   .onClick(async () => {
                     // 如果点击的是正在播放的按钮，则停止播放
@@ -195,7 +240,7 @@ export struct ShortMeowPage {
                   
                   Text(sound.description)
                     .fontSize(12)
-                    .fontColor('#999999')
+                    .fontColor(this.getCurrentThemeConfig().subtitleColor)
                     .textAlign(TextAlign.Center)
                     .maxLines(2)
                 }
@@ -212,32 +257,59 @@ export struct ShortMeowPage {
         .layoutWeight(1)
         .scrollable(ScrollDirection.Vertical)
         .scrollBar(BarState.Auto)
-        .margin({ bottom: this.isPlaying ? 80 : 20 }) // 为底部状态栏留出空间
+        .margin({ bottom: this.isPlaying ? 80 : 20 })
       }
       .width('100%')
       .height('100%')
       .padding({ left: 20, right: 20, bottom: 20 })
-      .backgroundColor('#F8F9FA')
+      .backgroundColor(this.getCurrentThemeConfig().backgroundColor)
 
       // 固定在底部的播放状态提示
       if (this.isPlaying) {
-        Row({ space: 10 }) {
-          LoadingProgress()
-            .width(20)
-            .height(20)
-            .color('#4ECDC4')
-          Text(`正在播放: ${this.currentSound}`)
-            .fontSize(14)
-            .fontColor('#4ECDC4')
+        Row({ space: 15 }) {
+          // 播放状态信息
+          Row({ space: 10 }) {
+            LoadingProgress()
+              .width(20)
+              .height(20)
+              .color(this.getCurrentThemeConfig().primaryColor)
+            Text(`正在播放: ${this.currentSound}`)
+              .fontSize(14)
+              .fontColor(this.getCurrentThemeConfig().primaryColor)
+              .layoutWeight(1)
+          }
+          .layoutWeight(1)
+          
+          // 停止按钮
+          Button() {
+            Row({ space: 6 }) {
+              Image($r('sys.media.ohos_ic_public_pause'))
+                .width(16)
+                .height(16)
+                .fillColor(Color.White)
+              Text('停止')
+                .fontSize(12)
+                .fontColor(Color.White)
+            }
+          }
+          .width(60)
+          .height(36)
+          .backgroundColor(this.getCurrentThemeConfig().secondaryColor)
+          .borderRadius(18)
+          .onClick(async () => {
+            await this.stopSound();
+          })
         }
-        .justifyContent(FlexAlign.Center)
+        .justifyContent(FlexAlign.SpaceBetween)
+        .alignItems(VerticalAlign.Center)
         .width('100%')
         .height(60)
-        .backgroundColor(Color.White)
+        .padding({ left: 20, right: 20 })
+        .backgroundColor(this.getCurrentThemeConfig().cardBackground)
         .borderRadius({ topLeft: 12, topRight: 12 })
         .shadow({
           radius: 8,
-          color: 'rgba(0, 0, 0, 0.1)',
+          color: this.currentTheme === ThemeType.DARK ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
           offsetX: 0,
           offsetY: -2
         })

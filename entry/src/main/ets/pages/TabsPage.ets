@@ -1,11 +1,32 @@
 import { router } from '@kit.ArkUI';
 import { ShortMeowPage } from './ShortMeowPage';
 import { LongMeowPage } from './LongMeowPage';
+import { ThemeManager, ThemeType, ThemeConfig } from '../common/ThemeManager';
 
 @Entry
 @Component
 struct TabsPage {
   @State currentIndex: number = 0;
+  @State private currentTheme: ThemeType = ThemeType.DEFAULT;
+  
+  private themeManager: ThemeManager = ThemeManager.getInstance();
+  private themeListener = (theme: ThemeType) => {
+    this.currentTheme = theme;
+  };
+
+  // 获取当前主题配置
+  private getCurrentThemeConfig(): ThemeConfig {
+    return this.themeManager.getThemeConfig(this.currentTheme);
+  }
+
+  aboutToAppear() {
+    this.currentTheme = this.themeManager.getCurrentTheme();
+    this.themeManager.addListener(this.themeListener);
+  }
+
+  aboutToDisappear() {
+    this.themeManager.removeListener(this.themeListener);
+  }
 
   @Builder
   TabBuilder(title: string, targetIndex: number) {
@@ -15,8 +36,9 @@ struct TabsPage {
         .width(20)
         .height(20)
         .objectFit(ImageFit.Contain)
+        .fillColor(this.currentIndex === targetIndex ? this.getCurrentThemeConfig().tabActiveColor : this.getCurrentThemeConfig().tabInactiveColor)
       Text(title)
-        .fontColor(this.currentIndex === targetIndex ? '#1698CE' : '#6B6B6B')
+        .fontColor(this.currentIndex === targetIndex ? this.getCurrentThemeConfig().tabActiveColor : this.getCurrentThemeConfig().tabInactiveColor)
         .fontSize(10)
         .fontWeight(500)
         .lineHeight(14)
@@ -42,7 +64,7 @@ struct TabsPage {
     }
     .width('100%')
     .height('100%')
-    .barBackgroundColor('#F1F3F5')
+    .barBackgroundColor(this.getCurrentThemeConfig().tabBarBackground)
     .onChange((index: number) => {
       this.currentIndex = index;
     })

@@ -10,10 +10,11 @@ struct TabsPage {
   @Builder
   TabBuilder(title: string, targetIndex: number) {
     Column() {
-      // 使用简单的文本图标替代图片资源
-      Text(targetIndex === 0 ? '🔊' : '📢')
-        .fontSize(20)
-        .fontColor(this.currentIndex === targetIndex ? '#1698CE' : '#6B6B6B')
+      // 使用重命名后的PNG图片
+      Image(targetIndex === 0 ? $r('app.media.siamese_cat') : $r('app.media.ragdoll_cat'))
+        .width(20)
+        .height(20)
+        .objectFit(ImageFit.Contain)
       Text(title)
         .fontColor(this.currentIndex === targetIndex ? '#1698CE' : '#6B6B6B')
         .fontSize(10)

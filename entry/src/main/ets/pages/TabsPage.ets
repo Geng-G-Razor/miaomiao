@@ -7,12 +7,8 @@ import { ThemeManager, ThemeType, ThemeConfig } from '../common/ThemeManager';
 @Component
 struct TabsPage {
   @State currentIndex: number = 0;
-  @State private currentTheme: ThemeType = ThemeType.DEFAULT;
-  
-  private themeManager: ThemeManager = ThemeManager.getInstance();
-  private themeListener = (theme: ThemeType) => {
-    this.currentTheme = theme;
-  };
+  @Provide('currentTheme') currentTheme: ThemeType = ThemeType.DEFAULT;
+  @Provide('themeManager') themeManager: ThemeManager = ThemeManager.getInstance();
 
   // 获取当前主题配置
   private getCurrentThemeConfig(): ThemeConfig {
@@ -21,11 +17,6 @@ struct TabsPage {
 
   aboutToAppear() {
     this.currentTheme = this.themeManager.getCurrentTheme();
-    this.themeManager.addListener(this.themeListener);
-  }
-
-  aboutToDisappear() {
-    this.themeManager.removeListener(this.themeListener);
   }
 
   @Builder

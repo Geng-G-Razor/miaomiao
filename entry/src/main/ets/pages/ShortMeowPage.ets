@@ -16,12 +16,8 @@ export struct ShortMeowPage {
   @State private currentSound: string = '';
   @State private currentSoundId: string = '';
   @State private currentPlayer: media.AVPlayer | null = null;
-  @State private currentTheme: ThemeType = ThemeType.DEFAULT;
-  
-  private themeManager: ThemeManager = ThemeManager.getInstance();
-  private themeListener = (theme: ThemeType) => {
-    this.currentTheme = theme;
-  };
+  @Consume('currentTheme') currentTheme: ThemeType;
+  @Consume('themeManager') themeManager: ThemeManager;
 
   // 短猫叫声数据
   private shortMeowSounds: Array<MeowSound> = [
@@ -61,13 +57,10 @@ export struct ShortMeowPage {
 
   aboutToAppear() {
     this.initAudioPlayer();
-    this.currentTheme = this.themeManager.getCurrentTheme();
-    this.themeManager.addListener(this.themeListener);
   }
 
   aboutToDisappear() {
     this.releaseAudioPlayer();
-    this.themeManager.removeListener(this.themeListener);
   }
 
   private async initAudioPlayer() {
@@ -187,6 +180,8 @@ export struct ShortMeowPage {
           .borderRadius(18)
           .onClick(async () => {
             await this.themeManager.switchTheme();
+            // 手动触发父组件状态更新
+            this.currentTheme = this.themeManager.getCurrentTheme();
           })
         }
         .width('100%')

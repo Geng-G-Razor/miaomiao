@@ -5,7 +5,11 @@ import { BusinessError } from '@kit.BasicServicesKit';
 export enum ThemeType {
   DEFAULT = 'default',
   PINK = 'pink',
-  DARK = 'dark'
+  DARK = 'dark',
+  BLUE = 'blue',
+  GREEN = 'green',
+  PURPLE = 'purple',
+  ORANGE = 'orange'
 }
 
 // 定义主题配置接口
@@ -65,7 +69,7 @@ export class ThemeManager {
     },
     [ThemeType.DARK]: {
       name: '深色',
-      nextThemeName: '默认',
+      nextThemeName: '蓝色',
       backgroundColor: '#1A1A1A',
       primaryColor: '#64B5F6',
       secondaryColor: '#4FC3F7',
@@ -76,6 +80,62 @@ export class ThemeManager {
       tabBarBackground: '#2D2D2D',
       tabActiveColor: '#64B5F6',
       tabInactiveColor: '#999999'
+    },
+    [ThemeType.BLUE]: {
+      name: '蓝色',
+      nextThemeName: '绿色',
+      backgroundColor: '#F0F8FF',
+      primaryColor: '#2196F3',
+      secondaryColor: '#03A9F4',
+      textColor: '#1565C0',
+      subtitleColor: '#42A5F5',
+      cardBackground: '#FFFFFF',
+      activeColor: '#1976D2',
+      tabBarBackground: '#E3F2FD',
+      tabActiveColor: '#1976D2',
+      tabInactiveColor: '#90CAF9'
+    },
+    [ThemeType.GREEN]: {
+      name: '绿色',
+      nextThemeName: '紫色',
+      backgroundColor: '#F1F8E9',
+      primaryColor: '#4CAF50',
+      secondaryColor: '#8BC34A',
+      textColor: '#2E7D32',
+      subtitleColor: '#66BB6A',
+      cardBackground: '#FFFFFF',
+      activeColor: '#388E3C',
+      tabBarBackground: '#E8F5E8',
+      tabActiveColor: '#388E3C',
+      tabInactiveColor: '#81C784'
+    },
+    [ThemeType.PURPLE]: {
+      name: '紫色',
+      nextThemeName: '橙色',
+      backgroundColor: '#F3E5F5',
+      primaryColor: '#9C27B0',
+      secondaryColor: '#BA68C8',
+      textColor: '#6A1B9A',
+      subtitleColor: '#AB47BC',
+      cardBackground: '#FFFFFF',
+      activeColor: '#7B1FA2',
+      tabBarBackground: '#F3E5F5',
+      tabActiveColor: '#7B1FA2',
+      tabInactiveColor: '#CE93D8'
+    },
+    [ThemeType.ORANGE]: {
+      name: '橙色',
+      nextThemeName: '默认',
+      backgroundColor: '#FFF3E0',
+      primaryColor: '#FF9800',
+      secondaryColor: '#FFB74D',
+      textColor: '#E65100',
+      subtitleColor: '#FF8A65',
+      cardBackground: '#FFFFFF',
+      activeColor: '#F57C00',
+      tabBarBackground: '#FFF8E1',
+      tabActiveColor: '#F57C00',
+      tabInactiveColor: '#FFCC02'
     }
   };
 
